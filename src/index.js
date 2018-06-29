@@ -9,10 +9,7 @@ class ServerlessOfflineDotEnv {
     this.serverless = serverless;
 
     this.hooks = {
-      'before:run:run': this.run,
-      'before:offline:start': this.run,
-      'before:offline:start:init': this.run,
-      'before:invoke:local:invoke': this.run,
+      'before:offline:start:init': this.run.bind(this),
     };
 
   }
@@ -20,16 +17,18 @@ class ServerlessOfflineDotEnv {
   run() {
     return new Promise((resolve) => {
 
-      this.dotEnvVars = this.dotEnvVars || this.load();
+      const log = (key, oldValue, newValue, funcName) => {
+        this.serverless.cli.log(`Overriding environment variable ${key} for ${funcName ? `${funcName}() function` : 'all functions'} with value from dotenv: ${newValue}`);
+      };
 
-      this.override(this.serverless.service.provider.environment, (key, value) => {
-        this.serverless.cli.log(`Overriding env var ${key} for all functions with value from dotenv: "${value}"`);
+      this.override(this.serverless.service.provider.environment, (key, oldValue, newValue) => {
+        log(key, oldValue, newValue);
       });
 
-      Object.keys(this.serverless.service.functions).forEach((name) => {
-        if (this.serverless.service.functions[name].environment) {
-          this.override(overrides, this.serverless.service.functions[name].environment, (key, value) => {
-            this.serverless.cli.log(`Overriding env var ${key} for ${name}() function with value from dotenv: "${value}"`);
+      Object.keys(this.serverless.service.functions).forEach((funcName) => {
+        if (this.serverless.service.functions[funcName].environment) {
+          this.override(this.serverless.service.functions[funcName].environment, (key, oldValue, newValue) => {
+            log(key, oldValue, newValue, funcName);
           });
         }
       });
@@ -38,44 +37,59 @@ class ServerlessOfflineDotEnv {
     });
   }
 
-  load() {
+  dotenv() {
+    if (!this._dotenv) {
 
-    const vars = {};
+      this._dotenv = {};
 
-    fs.readFileSync('.env', {encoding: 'utf-8'}).split('\n').forEach((line) => {
+      const path = process.env.DOTENV_PATH || `${process.env.PWD}/.env`;
+      const encoding = process.env.DOTENV_ENCODING || 'utf-8';
 
-      const matched = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
-      if (!matched) {
-        return;
+      if (!fs.existsSync(path)) {
+
+        this.serverless.cli.log(`Reading dotenv variables from ${path} (encoding: ${encoding})`);
+
+        fs.readFileSync(path, {encoding}).split('\n').forEach((line) => {
+
+          const matched = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
+          if (!matched) {
+            return;
+          }
+
+          let [, key, value] = matched;
+
+          key = key.replace(/(^['"]|['"]$)/g, '').trim();
+          value = value.replace(/(^['"]|['"]$)/g, '').trim();
+
+          if ('#' === key[0]) {
+            return;
+          }
+
+          this._dotenv[key] = value;
+
+        });
       }
+    }
 
-      const [, key, value] = matched;
-
-      key = key.replace(/(^['"]|['"]$)/g, '').trim();
-      value = value.replace(/(^['"]|['"]$)/g, '').trim();
-
-      if ('#' === key[0]) {
-        continue;
-      }
-
-      vars[key] = value;
-
-    });
-
-    return vars;
+    return this._dotenv;
   }
 
   override(obj, callback) {
+
+    const dotenv = this.dotenv();
+
     Object.keys(obj).forEach((key) => {
 
-      if (!this.dotEnvVars.hasOwnProperty(key)) {
+      if (!dotenv.hasOwnProperty(key)) {
         return;
       }
 
-      obj[key] = this.dotEnvVars[key];
-      callback(key, this.dotEnvVars[key]);
+      let oldValue = obj[key];
+      obj[key] = dotenv[key];
+      callback(key, oldValue, dotenv[key]);
 
     });
+
   }
 
 }
