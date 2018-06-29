@@ -56,16 +56,15 @@ class ServerlessOfflineDotEnv {
             return;
           }
 
-          let [, key, value] = matched;
+          const [, key, value] = matched;
 
-          key = key.replace(/(^['"]|['"]$)/g, '').trim();
-          value = value.replace(/(^['"]|['"]$)/g, '').trim();
-
+          // Ignore comment lines
           if ('#' === key[0]) {
             return;
           }
 
-          this._dotenv[key] = value;
+          // Remove quotes and whitespace
+          this._dotenv[key] = value.replace(/(^['"]|['"]$)/g, '').trim();
 
         });
       }
