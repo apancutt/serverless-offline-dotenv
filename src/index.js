@@ -4,9 +4,11 @@ const fs = require('fs');
 
 class ServerlessOfflineDotEnv {
 
-  constructor(serverless) {
+  constructor(serverless, path, encoding) {
 
     this.serverless = serverless;
+    this.path = path || process.env.DOTENV_PATH || `${process.env.PWD}/.env`;
+    this.encoding = encoding || process.env.DOTENV_ENCODING || `utf-8`;
 
     this.hooks = {
       'before:offline:start:init': this.run.bind(this),
@@ -42,14 +44,11 @@ class ServerlessOfflineDotEnv {
 
       this._dotenv = {};
 
-      const path = process.env.DOTENV_PATH || `${process.env.PWD}/.env`;
-      const encoding = process.env.DOTENV_ENCODING || 'utf-8';
+      if (fs.existsSync(this.path)) {
 
-      if (fs.existsSync(path)) {
+        this.serverless.cli.log(`Reading dotenv variables from ${this.path} (encoding: ${this.encoding})`);
 
-        this.serverless.cli.log(`Reading dotenv variables from ${path} (encoding: ${encoding})`);
-
-        fs.readFileSync(path, {encoding}).split('\n').forEach((line) => {
+        fs.readFileSync(this.path, {encoding: this.encoding}).split('\n').forEach((line) => {
 
           const matched = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
           if (!matched) {
