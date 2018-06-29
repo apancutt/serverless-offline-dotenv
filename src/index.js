@@ -45,7 +45,7 @@ class ServerlessOfflineDotEnv {
       const path = process.env.DOTENV_PATH || `${process.env.PWD}/.env`;
       const encoding = process.env.DOTENV_ENCODING || 'utf-8';
 
-      if (!fs.existsSync(path)) {
+      if (fs.existsSync(path)) {
 
         this.serverless.cli.log(`Reading dotenv variables from ${path} (encoding: ${encoding})`);
 
