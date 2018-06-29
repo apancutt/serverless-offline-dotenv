@@ -9,18 +9,18 @@ class ServerlessOfflineDotEnv {
     this.serverless = serverless;
 
     this.hooks = {
-      'before:run:run': this.start,
-      'before:offline:start': this.start,
-      'before:offline:start:init': this.start,
-      'before:invoke:local:invoke': this.start,
+      'before:run:run': this.run,
+      'before:offline:start': this.run,
+      'before:offline:start:init': this.run,
+      'before:invoke:local:invoke': this.run,
     };
 
   }
 
-  start() {
+  run() {
     return new Promise((resolve) => {
 
-      this.dotEnvVars = this.dotEnvVars || loadDotEnvFile();
+      this.dotEnvVars = this.dotEnvVars || load();
 
       this.override(this.serverless.service.provider.environment, (key, value) => {
         this.serverless.cli.log(`Overriding env var ${key} for all functions with value from dotenv: "${value}"`);
@@ -38,7 +38,7 @@ class ServerlessOfflineDotEnv {
     });
   }
 
-  loadDotEnvFile(options) {
+  load() {
 
     const vars = {};
 
