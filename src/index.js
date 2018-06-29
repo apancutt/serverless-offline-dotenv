@@ -20,7 +20,7 @@ class ServerlessOfflineDotEnv {
   run() {
     return new Promise((resolve) => {
 
-      this.dotEnvVars = this.dotEnvVars || load();
+      this.dotEnvVars = this.dotEnvVars || this.load();
 
       this.override(this.serverless.service.provider.environment, (key, value) => {
         this.serverless.cli.log(`Overriding env var ${key} for all functions with value from dotenv: "${value}"`);
