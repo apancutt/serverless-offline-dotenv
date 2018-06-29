@@ -23,7 +23,7 @@ const serverless = {
 }
 
 it('overrides the env vars', async () => {
-  await new ServerlessOfflineDotEnv(serverless, `${__dirname}/.env`, 'utf-8').run();
+  await new ServerlessOfflineDotEnv(serverless, {'dotenv-path': `${__dirname}/.env`}).run();
   expect(serverless.service.provider.environment.MY_ENV).toBe('foo');
   expect(serverless.service.functions.myfunction.environment.MY_FUNC).toBe('bar');
 });

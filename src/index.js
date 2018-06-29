@@ -4,11 +4,11 @@ const fs = require('fs');
 
 class ServerlessOfflineDotEnv {
 
-  constructor(serverless, path, encoding) {
+  constructor(serverless, options) {
 
     this.serverless = serverless;
-    this.path = path || process.env.DOTENV_PATH || `${process.env.PWD}/.env`;
-    this.encoding = encoding || process.env.DOTENV_ENCODING || `utf-8`;
+    this.path = options['dotenv-path'] || `${process.env.PWD}/.env`;
+    this.encoding = options['dotenv-encoding'] || `utf-8`;
 
     this.hooks = {
       'before:offline:start:init': this.run.bind(this),
