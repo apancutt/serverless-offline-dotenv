@@ -10,7 +10,7 @@ invoked on `serverless offline start`.
 
 ## Installation
 
-NPM:
+Install the plugin with NPM:
 
 ```bash
 npm install --save-dev serverless-offline-dotenv
