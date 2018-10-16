@@ -22,5 +22,9 @@
   },
   "scripts": {
     "test": "jest"
+  },
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "dotenv-expand": "^4.2.0"
   }
 }

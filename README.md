@@ -16,12 +16,6 @@ NPM:
 npm install --save-dev serverless-offline-dotenv
 ```
 
-Yarn:
-
-```bash
-yarn add --dev serverless-offline-dotenv
-```
-
 Add the plugin to your `serverless.yml` file:
 
 ```yaml
