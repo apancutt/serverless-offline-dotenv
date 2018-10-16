@@ -10,21 +10,27 @@ invoked on `serverless offline start`.
 
 ## Installation
 
-Install the plugin with NPM:
+NPM:
 
 ```bash
 npm install --save-dev serverless-offline-dotenv
+```
+
+Yarn:
+
+```bash
+yarn add --dev serverless-offline-dotenv
 ```
 
 Add the plugin to your `serverless.yml` file:
 
 ```yaml
 plugins:
-    - serverless-offline-ssm
+    - serverless-offline-dotenv
     - serverless-offline
 ```
 
-It is important that the `serverless-offline-ssm` plugin is loaded before
+It is important that the `serverless-offline-dotenv` plugin is loaded before
 `serverless-offline`.
 
 ## Creating a `.env` file

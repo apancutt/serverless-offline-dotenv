@@ -9,6 +9,7 @@ class ServerlessOfflineDotEnv {
     this.serverless = serverless;
     this.path = options['dotenv-path'] || `${process.env.PWD}/.env`;
     this.encoding = options['dotenv-encoding'] || `utf-8`;
+    this.serverless.service.provider.environment = this.serverless.service.provider.environment || {}
 
     this.hooks = {
       'before:offline:start:init': this.run.bind(this),
@@ -49,11 +50,13 @@ class ServerlessOfflineDotEnv {
         this.serverless.cli.log(`Reading dotenv variables from ${this.path} (encoding: ${this.encoding})`);
 
         fs.readFileSync(this.path, {encoding: this.encoding}).split('\n').forEach((line) => {
+          
 
           const matched = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
           if (!matched) {
             return;
           }
+
 
           const [, key, value] = matched;
 
@@ -73,20 +76,15 @@ class ServerlessOfflineDotEnv {
   }
 
   override(obj, callback) {
-
+   
     const dotenv = this.dotenv();
 
-    Object.keys(obj).forEach((key) => {
-
-      if (!dotenv.hasOwnProperty(key)) {
-        return;
-      }
-
+    Object.keys(dotenv).forEach(key => {
       let oldValue = obj[key];
       obj[key] = dotenv[key];
-      callback(key, oldValue, dotenv[key]);
 
-    });
+      callback(key, oldValue, dotenv[key]);
+    })
 
   }
 
