@@ -23,19 +23,26 @@ class ServerlessOfflineDotEnv {
         this.serverless.cli.log(`Overriding environment variable ${key} for ${funcName ? `${funcName}() function` : 'all functions'} with value from dotenv: ${newValue}`);
       };
 
-      this.override(this.serverless.service.provider.environment, (key, oldValue, newValue) => {
-        log(key, oldValue, newValue);
-      });
+      if (this.serverless.service) {
 
-      Object.keys(this.serverless.service.functions).forEach((funcName) => {
-        if (this.serverless.service.functions[funcName].environment) {
-          this.override(this.serverless.service.functions[funcName].environment, (key, oldValue, newValue) => {
-            log(key, oldValue, newValue, funcName);
+        if (this.serverless.service.provider && this.serverless.service.provider.environment) {
+          this.override(this.serverless.service.provider.environment, (key, oldValue, newValue) => {
+            log(key, oldValue, newValue);
           });
         }
-      });
+
+        if (this.serverless.service.functions) {
+          Object.keys(this.serverless.service.functions).forEach((funcName) => {
+            this.override(this.serverless.service.functions[funcName].environment || {}, (key, oldValue, newValue) => {
+              log(key, oldValue, newValue, funcName);
+            });
+          });
+        }
+
+      }
 
       return resolve();
+
     });
   }
 
