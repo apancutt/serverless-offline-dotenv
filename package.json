@@ -15,7 +15,7 @@
   },
   "main": "src/index.js",
   "devDependencies": {
-    "jest": "^23.2.0"
+    "jest": "^23.6.0"
   },
   "peerDependencies": {
     "serverless-offline": "^3.25.4"
