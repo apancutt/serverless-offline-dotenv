@@ -18,7 +18,7 @@
     "jest": "^23.6.0"
   },
   "peerDependencies": {
-    "serverless-offline": "^3.25.4"
+    "serverless-offline": ">=3.25.4"
   },
   "scripts": {
     "test": "jest"
