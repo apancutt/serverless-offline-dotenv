@@ -15,10 +15,10 @@
   },
   "main": "src/index.js",
   "devDependencies": {
-    "jest": "^23.6.0"
+    "jest": "23"
   },
   "peerDependencies": {
-    "serverless-offline": ">=3.25.4"
+    "serverless-offline": "3"
   },
   "scripts": {
     "test": "jest"
