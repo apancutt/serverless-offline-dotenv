@@ -45,20 +45,27 @@ const serverlessWithProviderEnvAndFunctionEnv = {
 };
 
 it('it works without any env', async () => {
-  await new ServerlessOfflineDotEnv(serverlessWithoutEnv, {'dotenv-path': `${__dirname}/.env`}).run();
+  await new ServerlessOfflineDotEnv(serverlessWithoutEnv, { 'dotenv-path': `${__dirname}/.env` }).run();
 });
 
 it('it works with provider env only', async () => {
-  await new ServerlessOfflineDotEnv(serverlessWithProviderEnvOnly, {'dotenv-path': `${__dirname}/.env`}).run();
+  await new ServerlessOfflineDotEnv(serverlessWithProviderEnvOnly, { 'dotenv-path': `${__dirname}/.env` }).run();
 });
 
 it('it works with function env only', async () => {
-  await new ServerlessOfflineDotEnv(serverlessWithFunctionEnvOnly, {'dotenv-path': `${__dirname}/.env`}).run();
+  await new ServerlessOfflineDotEnv(serverlessWithFunctionEnvOnly, { 'dotenv-path': `${__dirname}/.env` }).run();
 });
 
-it('it overrides the env vars', async () => {
-  const serverless = {...serverlessWithProviderEnvAndFunctionEnv};
-  await new ServerlessOfflineDotEnv(serverless, {'dotenv-path': `${__dirname}/.env`}).run();
+it('it overrides custom env vars', async () => {
+  const serverless = { ...serverlessWithProviderEnvAndFunctionEnv };
+  await new ServerlessOfflineDotEnv(serverless, { 'dotenv-path': `${__dirname}/.env` }).run();
   expect(serverless.service.provider.environment.MY_ENV).toBe('foo');
   expect(serverless.service.functions.myfunction.environment.MY_FUNC).toBe('bar');
+});
+
+it('it overrides SLS env vars', async () => {
+  const serverless = { ...serverlessWithProviderEnvAndFunctionEnv };
+  await new ServerlessOfflineDotEnv(serverless, { 'dotenv-path': `${__dirname}/.env` }).run();
+  expect(serverless.service.provider.environment.SLS_ACCOUNT_ID).toBe('123');
+  expect(serverless.service.functions.myfunction.environment.SLS_ACCOUNT_ID).toBeUndefined();
 });

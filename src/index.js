@@ -8,7 +8,7 @@ class ServerlessOfflineDotEnv {
 
     this.serverless = serverless;
     this.path = options['dotenv-path'] || `${process.env.PWD}/.env`;
-    this.encoding = options['dotenv-encoding'] || `utf-8`;
+    this.encoding = options['dotenv-encoding'] || 'utf-8';
 
     this.hooks = {
       'before:offline:start:init': this.run.bind(this),
@@ -17,84 +17,73 @@ class ServerlessOfflineDotEnv {
   }
 
   run() {
-    return new Promise((resolve) => {
 
-      const log = (key, oldValue, newValue, funcName) => {
-        this.serverless.cli.log(`Overriding environment variable ${key} for ${funcName ? `${funcName}() function` : 'all functions'} with value from dotenv: ${newValue}`);
-      };
+    this.serverless.service = this.serverless.service || {};
+    this.serverless.service.provider = this.serverless.service.provider || {};
+    this.serverless.service.provider.environment = this.serverless.service.provider.environment || {};
 
-      if (this.serverless.service) {
+    const { custom, sls } = this.dotenv();
 
-        if (this.serverless.service.provider && this.serverless.service.provider.environment) {
-          this.override(this.serverless.service.provider.environment, (key, oldValue, newValue) => {
-            log(key, oldValue, newValue);
-          });
-        }
+    // SLS vars are always sent to the provider so that SLS internals can bind them to the event
+    // See: https://github.com/dherault/serverless-offline#environment-variables
+    this.override(this.serverless.service.provider.environment, sls, undefined, true);
 
-        if (this.serverless.service.functions) {
-          Object.keys(this.serverless.service.functions).forEach((funcName) => {
-            this.override(this.serverless.service.functions[funcName].environment || {}, (key, oldValue, newValue) => {
-              log(key, oldValue, newValue, funcName);
-            });
-          });
-        }
+    this.override(this.serverless.service.provider.environment, custom);
 
-      }
-
-      return resolve();
-
+    Object.keys(this.serverless.service.functions || {}).forEach((fn) => {
+      this.serverless.service.functions[fn].environment = this.serverless.service.functions[fn].environment || {};
+      this.override(this.serverless.service.functions[fn].environment, custom, fn);
     });
+
   }
 
   dotenv() {
-    if (!this._dotenv) {
 
-      this._dotenv = {};
-
-      if (fs.existsSync(this.path)) {
-
-        this.serverless.cli.log(`Reading dotenv variables from ${this.path} (encoding: ${this.encoding})`);
-
-        fs.readFileSync(this.path, {encoding: this.encoding}).split('\n').forEach((line) => {
-
-          const matched = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
-          if (!matched) {
-            return;
-          }
-
-          const [, key, value] = matched;
-
-          // Ignore comment lines
-          if ('#' === key[0]) {
-            return;
-          }
-
-          // Remove quotes and whitespace
-          this._dotenv[key] = value.replace(/(^['"]|['"]$)/g, '').trim();
-
-        });
-      }
+    if (!fs.existsSync(this.path)) {
+      this.serverless.cli.warn(`A dotenv file was not found at ${this.path}`);
+      return {};
     }
 
-    return this._dotenv;
-  }
+    this.serverless.cli.log(`Reading dotenv variables from ${this.path} (${this.encoding})`);
 
-  override(obj, callback) {
+    return fs.readFileSync(this.path, { encoding: this.encoding }).split('\n').reduce((accumulator, line) => {
 
-    const dotenv = this.dotenv();
-
-    Object.keys(obj).forEach((key) => {
-
-      if (!dotenv.hasOwnProperty(key)) {
-        return;
+      const match = line.trim().match(/^([\w.-]+)\s*=\s*(.*)$/)
+      if (!match) {
+        return accumulator;
       }
 
-      let oldValue = obj[key];
-      obj[key] = dotenv[key];
-      callback(key, oldValue, dotenv[key]);
+      let [ , key, value ] = match;
 
+      // Ignore comment lines
+      if (key.startsWith('#')) {
+        return accumulator;
+      }
+
+      // Remove quotes and whitespace
+      value = value.replace(/(^['"]|['"]$)/g, '').trim();
+
+      const type = key.startsWith('SLS_') ? 'sls' : 'custom';
+
+      return {
+        ...accumulator,
+        [type]: {
+          ...accumulator[type],
+          [key]: value,
+        },
+      };
+
+    }, { custom: {}, sls: {} });
+
+  }
+
+  override(previous, next, fn = undefined, force = false) {
+    Object.entries(next).forEach(([ key, value ]) => {
+      if (force || key in previous) {
+        this.serverless.cli.log(`Setting ${key} for ${fn ? `${fn} function` : 'all functions'} to value from dotenv: "${value}"`);
+        previous[key] = value;
+      }
     });
-
   }
 
 }
