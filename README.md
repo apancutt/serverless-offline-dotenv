@@ -1,19 +1,19 @@
 # serverless-offline-dotenv
 
-Override environment variables configured in `serverless.yml` with any values
-provided in a `.env` file located at the root of your project.
+Override environment variables configured in `serverless.yml` with any values provided in a `.env`
+file located at the root of your project.
 
 Both global and function-specific environment variables are overridden.
 
-This plugin is intended for local development only, and is therefore only
-invoked on `serverless offline start`.
+This plugin is intended for local development only, and is therefore only invoked on
+`serverless offline start`.
 
 ## Installation
 
-Install the plugin with NPM:
+Install the plugin:
 
 ```bash
-npm install --save-dev serverless-offline-dotenv
+yarn add -D serverless-offline-dotenv
 ```
 
 Add the plugin to your `serverless.yml` file:
@@ -24,13 +24,12 @@ plugins:
     - serverless-offline
 ```
 
-It is important that the `serverless-offline-dotenv` plugin is loaded before
-`serverless-offline`.
+It is important that the `serverless-offline-dotenv` plugin is loaded before `serverless-offline`.
 
 ## Creating a `.env` file
 
-Create a file at the root of your project named `.env` containing the
-environment variables that you want to override locally.
+Create a file at the root of your project named `.env` containing the environment variables that you
+want to override locally.
 
 ```
 # /path/to/project/.env
@@ -41,11 +40,9 @@ DB_USER=me
 DB_PASSWORD=secret
 ```
 
-Your `.env` file may contain sensitive information so you should add it to your
-`.gitignore` file.
+Your `.env` file may contain sensitive information so you should add it to your `.gitignore` file.
 
-You might want to provide a `.env.example` template to make setup easier for
-other developers.
+You might want to provide a `.env.example` template to make setup easier for other developers.
 
 ```
 # /path/to/project/.env.example
@@ -55,5 +52,11 @@ DB_USER=<your local database username here>
 DB_PASSWORD=<your local database password here>
 ```
 
-Developers can then create a `.env` file from the template by running
-`cp .env{.example,}` and make the appropriate changes.
+Developers can then create a `.env` file from the template by running `cp .env{.example,}` and make
+the appropriate changes.
+
+## Serverless Variables
+
+Any variables in your `.env` file that are prefixed with `SLS_` are assumed to be variables
+[supported by the Serverless framework](https://github.com/dherault/serverless-offline#environment-variables)
+and are therefore always appended to all functions.
