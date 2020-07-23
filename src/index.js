@@ -1,13 +1,14 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 class ServerlessOfflineDotEnv {
 
   constructor(serverless, options) {
 
     this.serverless = serverless;
-    this.path = options['dotenv-path'] || `${process.env.PWD}/.env`;
+    this.path = options['dotenv-path'] || path.resolve(process.cwd(), '.env');
     this.encoding = options['dotenv-encoding'] || 'utf-8';
 
     this.hooks = {
