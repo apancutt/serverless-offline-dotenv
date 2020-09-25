@@ -12,7 +12,7 @@ class ServerlessOfflineDotEnv {
     this.encoding = options['dotenv-encoding'] || 'utf-8';
 
     this.hooks = {
-      'before:offline:start:init': this.run.bind(this),
+      'before:offline:start': this.run.bind(this),
     };
 
   }
