@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline-dotenv",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Override environment variables when working locally with Serverless Offline.",
   "author": "Adam Pancutt <adam@pancutt.com>",
   "license": "MIT",
