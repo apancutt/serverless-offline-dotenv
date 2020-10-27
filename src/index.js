@@ -41,7 +41,7 @@ class ServerlessOfflineDotEnv {
   dotenv() {
 
     if (!fs.existsSync(this.path)) {
-      this.serverless.cli.warn(`A dotenv file was not found at ${this.path}`);
+      this.serverless.cli.log(`A dotenv file was not found at ${this.path}`);
       return {};
     }
 
