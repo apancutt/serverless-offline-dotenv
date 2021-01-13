@@ -40,10 +40,11 @@ class ServerlessOfflineDotEnv {
   }
 
   dotenv() {
+    const envvars = { custom: {}, sls: {} };
 
     if (!fs.existsSync(this.path)) {
       this.serverless.cli.log(`A dotenv file was not found at ${this.path}`);
-      return {};
+      return envvars;
     }
 
     this.serverless.cli.log(`Reading dotenv variables from ${this.path} (${this.encoding})`);
@@ -75,7 +76,7 @@ class ServerlessOfflineDotEnv {
         },
       };
 
-    }, { custom: {}, sls: {} });
+    }, envvars);
 
   }
 
