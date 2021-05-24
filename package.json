@@ -17,9 +17,6 @@
   "devDependencies": {
     "jest": "26"
   },
-  "peerDependencies": {
-    "serverless-offline": "3"
-  },
   "scripts": {
     "test": "jest"
   }
