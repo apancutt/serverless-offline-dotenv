@@ -1,5 +1,17 @@
 # serverless-offline-dotenv
 
+> ## Deprecation Notice
+>
+> Serverless v3 introduces [built-in support for dot-env files](https://www.serverless.com/framework/docs/environment-variables/)
+> making this plugin somewhat redundant since:
+>
+> 1. it's always best to use built-in functionality wherever possible
+> 2. the behavior of the two implementations are very much alike (though I've not thoroughly tested
+> for any variations in behavior so could be wrong)
+>
+> Please update your projects to use the native support for dot-env files instead, or [raise an issue](https://github.com/apancutt/serverless-offline-dotenv/issues/new)
+> if you believe this plugin should continue to be maintained (with reasons why).
+
 Override environment variables configured in `serverless.yml` with any values provided in a `.env`
 file located at the root of your project.
 

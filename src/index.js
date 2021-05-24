@@ -20,6 +20,8 @@ class ServerlessOfflineDotEnv {
 
   run() {
 
+    this.serverless.cli.log('DEPRECATION NOTICE: serverless-offline-dotenv is deprecated in favor of built-in dot-env support introduced in Serverless v3. Please raise an issue if you want support for this plugin to continue (with reasons why).');
+
     this.serverless.service = this.serverless.service || {};
     this.serverless.service.provider = this.serverless.service.provider || {};
     this.serverless.service.provider.environment = this.serverless.service.provider.environment || {};
